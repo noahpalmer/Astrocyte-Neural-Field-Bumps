@@ -87,7 +87,100 @@ end
 
 %%
 
-% Creates the plots for Figure 7.
+
+% Code in this section creates Figures 2 and 3.
+
+% Figure 2
+
+% These values are estimates of where bumps transition from stable to unstable for a
+% particular theta value (theta=0.03 for beta_cut1 and theta=0.3 for
+% beta_cut2) as predicted by the stability analysis of section 4.
+
+beta_cut1 = 0.0255017;   
+beta_cut2 = 0.01987; 
+
+
+% First curve theta=0.03
+theta1 = 0.03;    
+betas1 = linspace(0.001, beta_cut1, 600);  
+
+Delta_sols1u = zeros(size(betas1));
+Dg1u = 1.5;
+for k = 1:length(betas1)
+    b = betas1(k);
+    
+    f = @(D) theta1 - ((b + 2*gamma*D/pi - sqrt(b^2 + 4*b*gamma*D/pi)) / (2*gamma*D/pi)) .* sin(2*D);
+    Delta0 = Dg1u;
+    Delta_sols1u(k) = fsolve(f, Delta0);
+end
+
+
+beta1  = linspace(0.001, 20, 400);
+Deltap1 = linspace(0.01, pi/2, 400);  
+
+[B1, D1] = meshgrid(beta1, Deltap1);
+c0 = (B1 + 2*gamma*D1/pi - sqrt(B1.^2 + 4*B1*gamma.*D1/pi))./ (2*gamma*D1/pi);
+F1 = theta1-c0.*sin(2*D1);
+
+
+% Second curve theta=0.3
+theta2 = 0.3;    
+betas2 = linspace(0.001, beta_cut2, 600);  
+
+Delta_sols2u = zeros(size(betas2));
+Dg2u = 1.5;
+for k = 1:length(betas2)
+    b = betas2(k);
+    
+    f = @(D) theta2 - ((b + 2*gamma*D/pi - sqrt(b^2 + 4*b*gamma*D/pi)) / (2*gamma*D/pi)) .* sin(2*D);
+    Delta0 = Dg2u;
+    Delta_sols2u(k) = fsolve(f, Delta0);
+end
+
+
+
+
+beta2  = linspace(0.001, 5, 400);
+Deltap2 = linspace(0.01, pi/2, 400);   
+
+[B2, D2] = meshgrid(beta2, Deltap2);
+c0 = (B2 + 2*gamma*D2/pi - sqrt(B2.^2 + 4*B2*gamma.*D2/pi))./ (2*gamma*D2/pi);
+F2 = theta2-c0.*sin(2*D2);
+
+
+% Figure requires running finite difference simulation to first to obtain
+% U(:,1), Q(:,1) and A(:,1).
+
+figure('Color','w','Position',[100 100 900 700])
+tiledlayout(1,2,'Padding','compact','TileSpacing','compact')
+
+nexttile
+plot(x,Q(:,1),'k-.','LineWidth',5); hold on;
+plot(x,A(:,1),'k--','LineWidth',5)
+plot(x,U(:,1),'k-','LineWidth',5)
+
+[~, i] = min(abs(x - Delta));
+[~, j] = min(abs(x + Delta));
+plot(x(i), U(i,k), 'ro', 'MarkerSize', 12, 'MarkerFaceColor', 'r');
+plot(x(j), U(j,k), 'ro', 'MarkerSize', 12, 'MarkerFaceColor', 'r');
+xlim([-pi,pi])
+xlabel('x','FontSize',20);
+
+nexttile
+hold on
+contour(B1, D1, F1, [0 0], 'k--', 'LineWidth', 5);
+contour(B2, D2, F2, [0 0], 'k--', 'LineWidth', 5);
+plot(betas2, Delta_sols2u, 'k','LineWidth',5);
+plot(betas1, Delta_sols1u, 'k','LineWidth',5);
+
+ylim([0,pi/2+0.1])
+xlim([0,24])
+set(gca,'XScale','log');
+xlabel('\beta','FontSize',20);
+ylabel('\Delta','FontSize',20);
+
+
+% Creates the plots for Figure 7. Requires first running a finite difference simulation with a perturbation to the activity variable.
 
 figure;
 t = tiledlayout(2,3);
