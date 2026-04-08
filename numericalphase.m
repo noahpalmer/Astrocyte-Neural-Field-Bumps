@@ -25,7 +25,8 @@ function [velocity, drift] = numericalphase(beta_vals,D_vals,gamma_vals,theta,N,
     if length(gamma_vals) > 1 && length(D_vals) > 1
         error('The function "numericalphase" can only be used to create data for one phase diagram at a time. As a consequence, one of gamma_vals or D_vals must be a scalar.');
     end
-
+    
+    starttime = tic;
    
     dx = 2*pi/N;
     x = linspace(-pi,pi-dx,N)';
@@ -212,6 +213,7 @@ function [velocity, drift] = numericalphase(beta_vals,D_vals,gamma_vals,theta,N,
                 end
          end
     end
+    fprintf('Time elapsed: %.0f seconds\n',toc(starttime));
 end
 
 
