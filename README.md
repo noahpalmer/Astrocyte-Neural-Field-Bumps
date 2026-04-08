@@ -14,3 +14,6 @@ The code within this repository can be used to simulate and analyze stationary b
   Estimates the stability boundaries for finite diffusion using a low-Fourier mode truncation method outlined in Section 5.3.
 - detcomp.m :
   Auxiliary function used to compute the Evans function for analyticphase.m.
+
+**Requirements:**
+All code was run on MATLAB Version: 24.1.0.2603908 (R2024a) Update 3. 
