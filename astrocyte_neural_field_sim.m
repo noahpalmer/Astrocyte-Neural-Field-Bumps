@@ -86,7 +86,7 @@ end
 
 
 %%
-Code to generate figures 2 and 7. Requires running the simulation above to create the initial condition U(:,1), Q(:,1) and A(:,1) as well as simulated values after perturbation.
+%Code to generate figures 2 and 7. Requires running the simulation above to create the initial condition U(:,1), Q(:,1) and A(:,1) as well as simulated values after perturbation.
 
 % Creates figures 2 and
 
