@@ -18,7 +18,7 @@ gamma_valsn = linspace(1,1.6,50);
 
 % Parameters for numerical sims
 N = 8000; % Number of spatial grid points
-T = 500; % Simulation length, function has built in time step length of 0.01.
+T = 500; % Simulation length, function has built in time step length of 0.01, this can be changed by editing dt in "numericalphase.m".
 
 % Other parameters
 D = 1;
