@@ -80,7 +80,8 @@ function [velocity, drift] = numericalphase(beta_vals,D_vals,gamma_vals,theta,N,
                 Q = c0*((x>-Delta)&(x<Delta))+((x>Delta)|(x<-Delta));
         
                 % Velocity is determined by tracking the center of mass between
-                % time steps, so we initialize the center of mass for the IC:
+                % time steps using a circular mean.
+                % So we initialize the center of mass for the IC:
                 mass = trapz(x,U);
                 C0 = (cx*U)/mass;
                 S0 = (sx*U)/mass;
@@ -176,7 +177,8 @@ function [velocity, drift] = numericalphase(beta_vals,D_vals,gamma_vals,theta,N,
                     Q = c0*((x>-Delta)&(x<Delta))+((x>Delta)|(x<-Delta));
             
                     % Velocity is determined by tracking the center of mass between
-                    % time steps, so we initialize the center of mass for the IC:
+                    % time steps using a circular mean.
+                    % So we initialize the center of mass for the IC:
                     mass = trapz(x,U);
                     C0 = (cx*U)/mass;
                     S0 = (sx*U)/mass;
