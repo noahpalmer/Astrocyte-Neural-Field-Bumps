@@ -7,14 +7,14 @@ bumpwidth = 1.5; % Initial guess for bump width, setup for larger bump.
 
 % Values in parameter space for analytic phase diagrams of "fourierphase.m" and "analyticphase.m". Numerical simulations are quite slow for high resolutions
 % and so code is currently setup for lower resolution there.
-beta_vals = linspace(0.001,0.1,300);
-D_vals = linspace(0.001,0.6,300);
-gamma_vals = linspace(1,1.6,300);
+beta_vals = linspace(0.001,0.1,50);
+D_vals = linspace(0.001,0.6,50);
+gamma_vals = linspace(1,1.6,50);
 
 % Values in parameter space for "numericalphase.m". Setup to be lower resolution than the analytic comps for speed.
-beta_valsn = linspace(0.001,0.1,50);
-D_valsn = linspace(0.001,0.6,50);
-gamma_valsn = linspace(1,1.6,50);
+beta_valsn = linspace(0.001,0.1,5);
+D_valsn = linspace(0.001,0.6,5);
+gamma_valsn = linspace(1,1.6,5);
 
 % Parameters for numerical sims
 N = 8000; % Number of spatial grid points
@@ -47,15 +47,17 @@ phasegamma = analyticphase(beta_vals,D,gamma_vals,theta,1);
 % the given parameters. Computes the velocity of the perturbed bump at each location in phase space 
 % at time T as well as the cumulative drift at time T. 
 
-% (D,\beta) space diagrams
+% These can be very slow for 50 by 50 resolution. 
+
+% (D,\beta) space diagrams.  
 
 [velocityD, driftD] = numericalphase(beta_valsn,D_valsn,gamma,theta,N,T);
 
-% (\gamma,\beta) space diagrams
+% (\gamma,\beta) space diagrams.
 
 [velocityg, driftg] = numericalphase(beta_valsn,D,gamma_valsn,theta,N,T);
 
-
+%%
 % Figures
 
 figure;
@@ -125,3 +127,4 @@ contour(gamma_vals,beta_vals,phaseD10,[0 0],'k--','LineWidth',3);
 contour(gamma_vals,beta_vals,phaseD50,[0 0],'k--','LineWidth',3);
 contour(gamma_vals,beta_vals,phaseDinf,[0 0],'k-','LineWidth',3);
 ylim([0.001,0.1])
+
