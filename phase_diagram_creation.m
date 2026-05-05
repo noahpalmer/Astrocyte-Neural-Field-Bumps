@@ -7,14 +7,14 @@ bumpwidth = 1.5; % Initial guess for bump width, setup for larger bump.
 
 % Values in parameter space for analytic phase diagrams of "fourierphase.m" and "analyticphase.m". Numerical simulations are quite slow for high resolutions
 % and so code is currently setup for lower resolution there.
-beta_vals = linspace(0.001,0.1,50);
-D_vals = linspace(0.001,0.6,50);
-gamma_vals = linspace(1,1.6,50);
+beta_vals = linspace(0.001,0.1,500);
+D_vals = linspace(0.001,0.6,500);
+gamma_vals = linspace(1,1.6,500);
 
 % Values in parameter space for "numericalphase.m". Setup to be lower resolution than the analytic comps for speed.
-beta_valsn = linspace(0.001,0.1,5);
-D_valsn = linspace(0.001,0.6,5);
-gamma_valsn = linspace(1,1.6,5);
+beta_valsn = linspace(0.001,0.1,50);
+D_valsn = linspace(0.001,0.6,50);
+gamma_valsn = linspace(1,1.6,50);
 
 % Parameters for numerical sims
 N = 8000; % Number of spatial grid points
