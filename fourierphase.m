@@ -81,8 +81,8 @@ function stablevals = fourierphase(beta_vals,D_vals,gamma_vals,theta,tol)
                 eigvals = eig(Z);
                 [V,~] = eig(Z);
                 
-                % Test that the ekenvectors satisfy the rkht shift condition.
-                % Keep ekenvalues that meet this assumption.
+                % Test that the eigenvectors satisfy the right shift condition.
+                % Keep eigenvalues that meet this assumption.
     
                 valid_eigvals = [];
                 for j = 1:length(eigvals)
