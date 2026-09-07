@@ -60,7 +60,7 @@ LA = IA - (dt*D/tau)*D2;
 cx = dx*cos(x'); sx = dx*sin(x');
 
 
-for k=1:nt -1
+for k=1:nt-1
 
     %u(x,t) update
     QHu = Q(:,k).*(U(:,k) > theta);
@@ -126,7 +126,6 @@ xlim([-pi,pi])
 ylim([0.092,0.108])
 
 
-
 function c0 = czero(delta, beta, gamma)  
     c0 = (beta+2*(gamma*delta/pi)-sqrt(beta^2+4*beta*gamma*delta/pi))./(2*(gamma*delta/pi));
 end
@@ -135,64 +134,13 @@ end
 %%
 % Generates figure 2. Does not require initial simulation above.
 
-% These values are estimates of where bumps transition from stable to unstable for a
-% particular theta value (theta=0.03 for beta_cut1 and theta=0.3 for
-% beta_cut2) as predicted by the stability analysis of section 4.
-
-beta_cut1 = 0.0255017;   % For theta=0.03
-beta_cut2 = 0.01987;     % For theta=0.3
-
-% First curve theta=0.03
-theta1 = 0.03;    
-betas1 = linspace(0.001,beta_cut1,600);  %beta values up to where he stable region ends
-
-Delta_sols1 = zeros(size(betas1));
-Deltaguess = 1.5;
-for k = 1:length(betas1)
-    b = betas1(k);
-    f = @(D) theta1-((b+2*gamma*D/pi-sqrt(b^2+4*b*gamma*D/pi))/(2*gamma*D/pi)).*sin(2*D);
-    Delta0 = Deltaguess;
-    Delta_sols1(k) = fsolve(f,Delta0);
-end
-
-
-beta1  = linspace(0.001,20,400); % beta and delta values for a full contour, ignoring which regions are stable
-Deltap1 = linspace(0.01,pi/2,400);  
-
-[B1, D1] = meshgrid(beta1,Deltap1);
-c0 = (B1+2*gamma*D1/pi-sqrt(B1.^2+4*B1*gamma.*D1/pi))./(2*gamma*D1/pi);
-F1 = theta1-c0.*sin(2*D1);
-
-
-% Second curve theta=0.3
-theta2 = 0.3;    
-betas2 = linspace(0.001,beta_cut2,600); %beta values up to where he stable region ends
-
-Delta_sols2 = zeros(size(betas2));
-Deltaguess = 1.5;
-for k = 1:length(betas2)
-    b = betas2(k);
-    f = @(D) theta2-((b+2*gamma*D/pi-sqrt(b^2+4*b*gamma*D/pi))/(2*gamma*D/pi)).*sin(2*D);
-    Delta0 = Deltaguess;
-    Delta_sols2(k) = fsolve(f,Delta0);
-end
-
-beta2 = linspace(0.001,5,400); % beta and delta values for a full contour, ignoring which regions are stable 
-Deltap2 = linspace(0.01,pi/2,400);   
-
-[B2, D2] = meshgrid(beta2,Deltap2);
-c0 = (B2+2*gamma*D2/pi-sqrt(B2.^2+4*B2*gamma.*D2/pi))./(2*gamma*D2/pi);
-F2 = theta2-c0.*sin(2*D2);
-
-
-
-
+% Figure 2A
 N = 3000;    
 dx = 2*pi/N;    
 x = linspace(-pi,pi-dx,N)';
 
 gamma = 2; % Synaptic replenishment rate
-beta = 0.1; % Synaptic depletion rate
+beta = 0.3; % Synaptic depletion rate
 tau = 1; % Synaptic depression timescale
 D = 0.3; % Astrocytic resource diffusion constant
 theta = 0.03; %Neural activity threshold
@@ -210,20 +158,20 @@ Delta = fzero(f, initial_guess);
 kappa = Delta/pi;
 c0 = czero(Delta,beta,gamma);
 A0 = kappa*(1-c0);
-epsilon = 0.3*(2*c0*sin(Delta));
 
 
 % Initial conditions: stationary bump profile of section 3
 
 Ust = (2*c0*sin(Delta)).*cos(x);
-Ast = A0;
+Ast = A0.*ones(length(x),1);
 Qst = (c0).*((x>-Delta) & (x<Delta))+1.*((x>Delta)|(x<-Delta));
+
 
 figure('Color','w','Position',[100 100 900 700])
 tiledlayout(1,2,'Padding','compact','TileSpacing','compact')
 
 nexttile
-plot(x,Qst,'k-.','LineWidth',5); hold on;
+plot(x,Qst,'k:','LineWidth',5); hold on;
 plot(x,Ast,'k--','LineWidth',5)
 plot(x,Ust,'k-','LineWidth',5)
 
@@ -235,15 +183,53 @@ plot(x(j),Ust(j),'ro','MarkerSize',12,'MarkerFaceColor','r');
 xlim([-pi,pi])
 xlabel('x','FontSize',20);
 
-nexttile
-hold on
-contour(B1,D1,F1,[0 0],'r--','LineWidth',5);
-contour(B2,D2,F2,[0 0],'r--','LineWidth',5);
-plot(betas2,Delta_sols2,'k','LineWidth',6);
-plot(betas1,Delta_sols1,'k','LineWidth',6);
 
-ylim([0,pi/2+0.1])
-xlim([0,24])
-set(gca,'XScale','log');
-xlabel('\beta','FontSize',20);
-ylabel('\Delta','FontSize',20);
+% Figure 2B. 
+% Note: the lower branch is always unstable due to the contraction perturbation. 
+nexttile
+gamma = 2;
+D = 0.3;
+thetas = [0.03,0.3];
+n = 4000;
+hold on; box on
+for i = 1:2
+    theta = thetas(i);
+    Delta = linspace(asin(theta)/2,(pi-asin(theta))/2,n);
+    c0 = theta./sin(2*Delta);             
+    beta = gamma*Delta.*(1-c0).^2./(pi*c0);         
+    [~,branchindex] = max(beta);
+    narrowbump = 1:branchindex;
+    widebump = branchindex:length(Delta);
+
+    % Identify where bumps destabilize from shift perturbations, this can
+    % be done by checking for a double root of the Evans function (i.e.
+    % find where E'(0) becomes negative
+
+    h = 1e-12;
+    instabilityindex = fzero(@(x) detcompeval(h,theta,x,gamma,D),[1e-3,0.5]);
+    
+    
+    plot(beta(narrowbump),Delta(narrowbump),'r--','LineWidth',3); 
+    plot(beta(widebump(beta(widebump) > instabilityindex)), Delta(widebump(beta(widebump) > instabilityindex)),'r--','LineWidth',3);
+    plot(beta(widebump(beta(widebump) <= instabilityindex)), Delta(widebump(beta(widebump) <= instabilityindex)),'k-', 'LineWidth',4);
+end
+set(gca,'XScale','log'); 
+xlim([1e-3,24]); 
+ylim([0,pi/2+0.1]);
+
+
+function Dprime = detcompeval(lambda,theta,beta,gamma,D)
+Deltaguess = 1.5; % This could need change depending on the graph you're trying to make, 
+% but on the upper branch for the two theta values in figure 2B this is
+% close enough.
+f = @(a) czero(a,beta,gamma).*sin(2*a)-theta;
+a = fzero(f,Deltaguess);
+c0 = czero(a,beta,gamma);
+A0 = a*(1-c0)/pi;
+mu = 1/(2*c0*sin(a)^2);
+Qp = 1;
+Qm = c0;
+Dplus  = detcomp(lambda,D,beta,gamma,A0,c0,mu,a,Qp,Qm,1);
+Dminus = detcomp(-lambda,D,beta,gamma,A0,c0,mu,a,Qp,Qm,1);
+Dprime = real((Dplus-Dminus)/(2*lambda));
+end
